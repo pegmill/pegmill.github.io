@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pegmill — PEG grammars as LLM output constraints</title>
+<meta name="description" content="PEG grammars as LLM output constraints. TypeScript-native parser generator with parametric rules, WASM target, and directive extensions.">
+
+<meta property="og:title" content="Pegmill — PEG grammars as LLM output constraints">
+<meta property="og:description" content="TypeScript-native parser generator with parametric rules, WASM target, and directive extensions for open-weight LLMs.">
+<meta property="og:image" content="https://pegmill.github.io/assets/social-preview.png">
+<meta property="og:url" content="https://pegmill.github.io/">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="64x64" href="assets/favicon-64.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --slate-900: #0F172A;
+  --slate-800: #1E293B;
+  --slate-500: #64748B;
+  --slate-50:  #F8FAFC;
+  --cyan-500:  #06B6D4;
+  --cyan-400:  #22D3EE;
+  --green-500: #22C55E;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--slate-900);
+  background: var(--slate-50);
+}
+
+a { color: var(--cyan-500); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code, pre { font-family: var(--font-mono); }
+code { font-size: 0.92em; background: rgba(6,182,212,0.08); padding: 0.12em 0.35em; border-radius: 3px; }
+pre { background: var(--slate-900); color: var(--slate-50); padding: 1.1rem 1.3rem; border-radius: 6px; overflow-x: auto; font-size: 0.9em; line-height: 1.55; }
+pre code { background: none; padding: 0; color: inherit; }
+
+.wrap { max-width: 860px; margin: 0 auto; padding: 0 1.5rem; }
+
+nav { padding: 1.25rem 0; border-bottom: 1px solid rgba(15,23,42,0.08); }
+nav .wrap { display: flex; align-items: center; gap: 1.5rem; }
+nav .mark { font-family: var(--font-mono); font-weight: 500; font-size: 1rem; color: var(--slate-900); }
+nav .mark .op { color: var(--cyan-500); }
+nav .links { margin-left: auto; display: flex; gap: 1.5rem; font-size: 0.92rem; }
+nav .links a { color: var(--slate-500); }
+nav .links a:hover { color: var(--cyan-500); text-decoration: none; }
+
+.hero { padding: 5rem 0 3.5rem; text-align: center; }
+.hero h1 {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: clamp(2.2rem, 5vw, 3.2rem);
+  margin: 0 0 1.2rem;
+  letter-spacing: -0.01em;
+}
+.hero h1 .op { color: var(--cyan-500); }
+.hero p.lead {
+  font-size: 1.2rem;
+  color: var(--slate-900);
+  max-width: 680px;
+  margin: 0 auto 0.9rem;
+  font-weight: 500;
+}
+.hero p.sublead {
+  font-size: 1rem;
+  color: var(--slate-500);
+  max-width: 620px;
+  margin: 0 auto 2rem;
+}
+@media (prefers-color-scheme: dark) { .hero p.lead { color: var(--slate-50); } }
+.badges { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-bottom: 2rem; }
+.badges img { height: 22px; }
+
+.cta { display: inline-flex; gap: 0.8rem; margin-top: 0.5rem; }
+.btn {
+  display: inline-block;
+  padding: 0.7rem 1.4rem;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 0.95rem;
+  border: 1px solid transparent;
+  transition: background 0.15s, border-color 0.15s;
+}
+.btn-primary { background: var(--cyan-500); color: white; }
+.btn-primary:hover { background: #0891B2; text-decoration: none; }
+.btn-ghost { color: var(--slate-900); border-color: rgba(15,23,42,0.15); }
+.btn-ghost:hover { border-color: var(--cyan-500); color: var(--cyan-500); text-decoration: none; }
+
+section { padding: 3rem 0; }
+section h2 {
+  font-size: 1.55rem;
+  font-weight: 600;
+  margin: 0 0 1.2rem;
+  letter-spacing: -0.005em;
+}
+section p { margin: 0 0 1rem; }
+
+.terminal {
+  background: var(--slate-900);
+  color: var(--slate-50);
+  font-family: var(--font-mono);
+  font-size: 0.92rem;
+  padding: 1.4rem 1.6rem;
+  border-radius: 8px;
+  margin: 1.5rem 0;
+  line-height: 1.7;
+}
+.terminal .bracket { color: var(--cyan-400); }
+.terminal .ok { color: var(--green-500); }
+.terminal .path { color: var(--slate-500); }
+.terminal .prompt { color: var(--cyan-400); user-select: none; }
+
+.features { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem 2.5rem; margin: 1.5rem 0; }
+.features > div h3 { font-size: 1.05rem; font-weight: 600; margin: 0 0 0.35rem; }
+.features > div p { color: var(--slate-500); font-size: 0.95rem; margin: 0; }
+@media (max-width: 640px) { .features { grid-template-columns: 1fr; } }
+
+ul.clean { padding-left: 1.2rem; margin: 0.6rem 0 1rem; }
+ul.clean li { margin: 0.3rem 0; }
+
+.phase { display: grid; grid-template-columns: 6rem 1fr; gap: 1rem; padding: 0.9rem 0; border-top: 1px solid rgba(15,23,42,0.08); }
+.phase:last-child { border-bottom: 1px solid rgba(15,23,42,0.08); }
+.phase .tag { font-family: var(--font-mono); font-size: 0.82rem; color: var(--cyan-500); padding-top: 0.15rem; }
+.phase h4 { margin: 0 0 0.2rem; font-size: 1rem; font-weight: 600; }
+.phase p { margin: 0; color: var(--slate-500); font-size: 0.95rem; }
+
+footer { border-top: 1px solid rgba(15,23,42,0.08); padding: 2.5rem 0 3.5rem; margin-top: 3rem; color: var(--slate-500); font-size: 0.9rem; }
+footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+footer .mark { font-family: var(--font-mono); }
+footer .mark .op { color: var(--cyan-500); }
+
+@media (prefers-color-scheme: dark) {
+  body { background: var(--slate-900); color: var(--slate-50); }
+  nav, footer { border-color: rgba(248,250,252,0.08); }
+  nav .mark { color: var(--slate-50); }
+  a { color: var(--cyan-400); }
+  .btn-ghost { color: var(--slate-50); border-color: rgba(248,250,252,0.15); }
+  .btn-ghost:hover { color: var(--cyan-400); border-color: var(--cyan-400); }
+  .phase { border-color: rgba(248,250,252,0.08); }
+  .phase:last-child { border-bottom-color: rgba(248,250,252,0.08); }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <span class="mark">peg <span class="op">::=</span> mill</span>
+    <div class="links">
+      <a href="#install">install</a>
+      <a href="#comparison">compare</a>
+      <a href="#roadmap">roadmap</a>
+      <a href="#support">support</a>
+      <a href="https://github.com/pegmill/pegmill">github</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <h1>peg <span class="op">::=</span> mill</h1>
+    <p class="lead">PEG grammars as LLM output constraints — grammar expressiveness that regex and CFG solutions can't match.</p>
+    <p class="sublead">TypeScript-native parser generator. Parametric PEG rules today, per-token constrained decoding for open-weight LLMs on the roadmap.</p>
+
+    <div class="badges">
+      <a href="https://www.npmjs.com/package/pegmill"><img src="https://img.shields.io/npm/v/pegmill.svg?color=06B6D4&amp;style=flat" alt="npm"></a>
+      <a href="https://github.com/pegmill/pegmill/actions/workflows/ci.yml"><img src="https://github.com/pegmill/pegmill/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+      <a href="https://opensource.org/licenses/Apache-2.0"><img src="https://img.shields.io/badge/license-Apache--2.0-06B6D4.svg?style=flat" alt="License: Apache 2.0"></a>
+    </div>
+
+    <div class="cta">
+      <a href="#install" class="btn btn-primary">Install</a>
+      <a href="https://github.com/pegmill/pegmill" class="btn btn-ghost">Source on GitHub</a>
+    </div>
+  </div>
+</header>
+
+<section id="install">
+  <div class="wrap">
+    <h2>Install in one command</h2>
+    <p>Existing PEG.js 0.10.0 grammars compile without changes.</p>
+    <pre><code><span style="color:var(--cyan-400)">$</span> npm install -g pegmill
+<span style="color:var(--cyan-400)">$</span> pegmill grammar.pegjs</code></pre>
+
+<div class="terminal">
+<span class="path">pegmill v0.1.2</span>
+
+<span class="bracket">⟦ parse   ⟧</span> grammar.pegjs
+<span class="bracket">⟦ rules   ⟧</span> 42 rules loaded
+<span class="bracket">⟦ compile ⟧</span> generating parser
+<span class="bracket">⟦ emit    ⟧</span> parser.js
+
+<span class="ok">✔</span> build completed in 48ms
+</div>
+  </div>
+</section>
+
+<section id="why">
+  <div class="wrap">
+    <h2>Four things PEG.js never had</h2>
+
+    <div class="features">
+      <div>
+        <h3>Parametric rules</h3>
+        <p>Write <code>SepList&lt;Elem, Sep&gt;</code> once. Podlite uses it to compress nine formatting-code variants — <code>A&lt;&gt;</code>, <code>B&lt;&gt;</code>, <code>C&lt;&gt;</code>, through <code>Z&lt;&gt;</code> — into a single rule.</p>
+      </div>
+      <div>
+        <h3>Drop-in for PEG.js 0.10.0</h3>
+        <p>Run <code>pegmill grammar.pegjs</code> against existing grammars with zero edits. Podlite runs 1600+ parser tests through it in production today.</p>
+      </div>
+      <div>
+        <h3>WASM target (Phase 2)</h3>
+        <p>One grammar, deploy to Node, Deno, Bun, or the browser. No platform binaries. No Python bridge.</p>
+      </div>
+      <div>
+        <h3>Constrained decoding (Phase 4)</h3>
+        <p>PEG grammar becomes a per-token mask for open-weight LLMs — Gemma, GLM, Qwen. Hallucinated structure becomes impossible, not just unlikely.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="grammar-example">
+  <div class="wrap">
+    <h2>Write the list rule once, reuse everywhere</h2>
+    <p>Every PEG generator makes you copy-paste a list rule for each combination of element type and separator. Pegmill lets the pattern live in one place:</p>
+
+<pre><code>SepList&lt;Elem, Sep&gt;
+  = head:Elem tail:(_ Sep _ Elem)*
+    { return [head, ...tail.map(t =&gt; t[3])]; }
+
+CsvRow   = SepList&lt;QuotedField, ","&gt;
+ProtoVer = SepList&lt;Version, "."&gt;
+PathSegs = SepList&lt;Ident, "/"&gt;</code></pre>
+
+    <p>Inline expressions and string literals work as arguments too: <code>List&lt;[a-z]+, ","&gt;</code>, <code>Tag&lt;"b"&gt;</code>.</p>
+  </div>
+</section>
+
+<section id="comparison">
+  <div class="wrap">
+    <h2>Where Pegmill fits among existing tools</h2>
+    <p>Constrained decoding already works in two ecosystems. Pegmill covers the third.</p>
+
+    <div class="features">
+      <div>
+        <h3>Outlines · Python</h3>
+        <p>Regex and Lark CFG constraints. Mature, production-ready. Requires a Python runtime in your stack.</p>
+      </div>
+      <div>
+        <h3>XGrammar · C++ (vLLM default)</h3>
+        <p>Pushdown CFG with 14–80× speedup. Excellent for server-side batch. Python bindings; C++ core.</p>
+      </div>
+      <div>
+        <h3>llama.cpp GBNF · C++</h3>
+        <p>BNF extension baked into llama.cpp. De facto for local inference. Grammar syntax is narrower than PEG.</p>
+      </div>
+      <div>
+        <h3>Pegmill · TypeScript</h3>
+        <p>PEG grammars, predicates, lookahead. WASM target for Node, Deno, Bun, browser. No Python bridge, no C++ build step.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="roadmap">
+  <div class="wrap">
+    <h2>The roadmap bets on constrained decoding</h2>
+    <p>Python and C++ solutions ship today (see <a href="#comparison">the comparison above</a>). Nobody ships a TypeScript stack with PEG grammars and a WASM target. That is the gap Pegmill is walking into — and the 12–18 month window is still open.</p>
+
+    <div class="phase">
+      <div class="tag">Phase 1</div>
+      <div>
+        <h4>Parametric rules — done</h4>
+        <p>Released as <code>pegmill@0.1.2</code>. 1115 spec tests passing, verified against Podlite grammar in production.</p>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="tag">Phase 2</div>
+      <div>
+        <h4>WASM backend</h4>
+        <p>Compile grammars to WebAssembly for universal deployment. Q3 2026, dependent on Axona traction.</p>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="tag">Phase 3a</div>
+      <div>
+        <h4><code>@dispatch</code> directive</h4>
+        <p>Table-driven choice routing, 4.7× fewer rule attempts for Podlite-class grammars. Prerequisite for per-token constraint checks in Phase 4.</p>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="tag">Phase 4</div>
+      <div>
+        <h4>LLM constrained decoding</h4>
+        <p>PEG grammar as hard per-token constraint. Target runtime: Gemma, GLM, Qwen via node-llama-cpp. 12–18 month window before the TypeScript niche fills in.</p>
+      </div>
+    </div>
+
+    <p style="margin-top:1.5rem;">Full plan with competitive landscape and watch items: <a href="https://github.com/pegmill/pegmill/blob/main/ROADMAP.md">ROADMAP.md</a>.</p>
+  </div>
+</section>
+
+<section id="about">
+  <div class="wrap">
+    <h2>Independent project, Apache 2.0</h2>
+    <p>No VC, no corporate sponsor, no equity on anything. Maintained by <a href="https://github.com/zag">Aliaksandr Zahatski</a>, hosted under the <a href="https://github.com/pegmill">pegmill</a> GitHub organization.</p>
+    <p>The fork from PEG.js 0.10.0 happened after PR #337 — the WASM backend — closed unmerged in the upstream. Peggy's plugin surface could not cover the codegen changes that path required, so forking was the only route. Pegmill keeps PEG.js compatibility as a baseline and treats everything beyond that as new territory.</p>
+  </div>
+</section>
+
+<section id="support">
+  <div class="wrap">
+    <h2>A star is the fastest way to help</h2>
+    <p>Stars on <a href="https://github.com/pegmill/pegmill">GitHub</a> and links from your project move the dial faster than anything else at this stage.</p>
+    <p>If you run Pegmill in production and want to talk about security audits, stability guarantees, or contributing a WASM backend — <a href="https://github.com/pegmill/pegmill/issues">the issue tracker</a> is the channel. Same for sponsorship and grant-program enquiries.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span class="mark">peg <span class="op">::=</span> mill</span>
+    <span>Apache 2.0 · <a href="https://github.com/pegmill/pegmill">GitHub</a> · <a href="https://www.npmjs.com/package/pegmill">npm</a></span>
+  </div>
+</footer>
+
+</body>
+</html>
