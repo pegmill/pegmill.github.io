@@ -258,7 +258,7 @@ PathSegs = SepList&lt;Ident, "/"&gt;</code></pre>
 <section id="comparison">
   <div class="wrap">
     <h2>Where Pegmill fits among existing tools</h2>
-    <p>Constrained decoding already works in two ecosystems. Pegmill covers the third.</p>
+    <p>Constrained decoding works across several ecosystems. Pegmill targets the install-and-go TypeScript path.</p>
 
     <div class="features">
       <div>
@@ -266,8 +266,8 @@ PathSegs = SepList&lt;Ident, "/"&gt;</code></pre>
         <p>Regex and Lark CFG constraints. Mature, production-ready. Requires a Python runtime in your stack.</p>
       </div>
       <div>
-        <h3>XGrammar · C++ (vLLM default)</h3>
-        <p>Pushdown CFG with 14–80× speedup. Excellent for server-side batch. Python bindings; C++ core.</p>
+        <h3>XGrammar · C++ / JS (build-from-source)</h3>
+        <p>Pushdown CFG with 14–80× speedup. Excellent for server-side batch. C++ core with Python bindings; JavaScript via emscripten build (no npm package yet).</p>
       </div>
       <div>
         <h3>llama.cpp GBNF · C++</h3>
@@ -275,7 +275,7 @@ PathSegs = SepList&lt;Ident, "/"&gt;</code></pre>
       </div>
       <div>
         <h3>Pegmill · TypeScript</h3>
-        <p>PEG grammars, predicates, lookahead. WASM target for Node, Deno, Bun, browser. No Python bridge, no C++ build step.</p>
+        <p>PEG grammars, predicates, lookahead. <code>npm install pegmill</code>, ready in Node, Deno, Bun, or the browser. No Python bridge, no emsdk build step.</p>
       </div>
     </div>
   </div>
