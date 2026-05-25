@@ -59,7 +59,7 @@ nav { padding: 1.25rem 0; border-bottom: 1px solid rgba(15,23,42,0.08); }
 nav .wrap { display: flex; align-items: center; gap: 1.5rem; }
 nav .mark { font-family: var(--font-mono); font-weight: 500; font-size: 1rem; color: var(--slate-900); }
 nav .mark .op { color: var(--cyan-500); }
-nav .links { margin-left: auto; display: flex; gap: 1.5rem; font-size: 0.92rem; }
+nav .links { margin-left: auto; display: flex; flex-wrap: wrap; gap: 0.5rem 1.25rem; font-size: 0.92rem; }
 nav .links a { color: var(--slate-500); }
 nav .links a:hover { color: var(--cyan-500); text-decoration: none; }
 
@@ -168,6 +168,8 @@ footer .mark .op { color: var(--cyan-500); }
       <a href="#install">install</a>
       <a href="#comparison">compare</a>
       <a href="#roadmap">roadmap</a>
+      <a href="#about">about</a>
+      <a href="#services">services</a>
       <a href="#support">support</a>
       <a href="https://github.com/pegmill/pegmill">github</a>
     </div>
@@ -322,8 +324,32 @@ PathSegs = SepList&lt;Ident, "/"&gt;</code></pre>
 <section id="about">
   <div class="wrap">
     <h2>Independent project, Apache 2.0</h2>
-    <p>Independently funded, sustainable through OSS-aligned commercial services. Maintained by <a href="https://github.com/zag">Aliaksandr Zahatski</a>, hosted under the <a href="https://github.com/pegmill">pegmill</a> GitHub organization.</p>
+    <p>Independently funded, sustainable through OSS-aligned commercial services. Maintained by <a href="https://github.com/zag">Aliaksandr Zahatski</a>.</p>
     <p>The fork from PEG.js 0.10.0 happened after PR #337 — the WASM backend — closed unmerged in the upstream. Peggy's plugin surface could not cover the codegen changes that path required, so forking was the only route. Pegmill keeps PEG.js compatibility as a baseline and treats everything beyond that as new territory.</p>
+  </div>
+</section>
+
+<section id="services">
+  <div class="wrap">
+    <h2>Commercial services around Pegmill</h2>
+    <p>Pegmill stays open source under Apache 2.0. Teams that need more than the public library can hire the maintainer directly.</p>
+
+    <div class="features">
+      <div>
+        <h3>Custom grammar authoring</h3>
+        <p>Production-ready PEG grammars for teams with complex parsing requirements — DSLs, config formats, structured-output schemas.</p>
+      </div>
+      <div>
+        <h3>Enterprise support</h3>
+        <p>Priority response, version pinning, security advisories, and stability guarantees for Pegmill in production.</p>
+      </div>
+      <div>
+        <h3>Integration consulting</h3>
+        <p>Embedding Pegmill into existing parser pipelines, and migration from PEG.js, Peggy, or hand-written parsers.</p>
+      </div>
+    </div>
+
+    <p style="margin-top:1.5rem;">Email <a href="mailto:hello@pegmill.dev">hello@pegmill.dev</a> with a short description of your use case.</p>
   </div>
 </section>
 
